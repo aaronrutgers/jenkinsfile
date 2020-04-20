@@ -1,0 +1,27 @@
+pipeline{
+    agent any
+    tools {
+        maven "Maven"
+    }
+    stages{
+        stage("Getscm"){
+            steps{
+                git changelog: false, credentialsId: 'github_credentials', poll: false, url: 'https://github.com/aaronrutgers/spring3-mvc-maven-xml-hello-world.git'
+            }
+
+        }
+        stage('Build'){
+            steps{
+                script {
+                    bat(/${MAVEN_HOME}\bin\mvn -Dmaven.test.failure.ignore clean package/)
+                }
+            }
+        }
+        stage('deploy'){
+            steps{
+                bat "curl -v -u admin:admin -T target\\spring3-mvc-maven-xml-hello-world-1.2.war \"http://lican10142c.mylabserver.com:8080//manager/text/deploy?path=/spring-pipeline\""
+            }
+        }
+    }
+
+}
